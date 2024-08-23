@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOMPET ANAK KOST</title>
+</head>
+<body>
+    <h1>Rp <span id="saldo">500</span>k</h1>
+    <input id="jumlah" type="number" placeholder="Masukkan Jumlah (>1k)"><br>
+    <input id="catatan" type="text" placeholder="Masukkan Catatan"><br>
+    <Button onclick="masuk()">Masukkan</Button>
+    <Button onclick="keluar()">Keluarkan</Button>
+    <p>records :<br> <span id="recordfield"></span> </p>
+    <br>
+    <br>
+    <br>
+    <p>app by anak kost for anak kost <br> - deeogikk 2024 - </p>
+</body>
+</html>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=New+Amsterdam&display=swap');
+
+    body {
+        font-family: "New Amsterdam", sans-serif;
+        text-align: center;
+        background-color: #101010;
+        color: white;
+        font-size: 40px;
+    }
+
+    h1 {
+        font-size: 60px;
+    }
+    p  {
+        font-size: 25px;
+    }
+    input {
+        width: 80%; height: 40px;
+        border: none;
+        border-radius: 20px;
+        text-align: center;
+    }
+    button {
+        margin-top: 10px;
+        width: 150px; height: 40px;
+        border: none;
+        border-radius: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    button:hover {
+        transform: scale(1.02);
+    }
+
+</style>
+
+<script>
+    var currentDate = new Date
+
+    function saveSaldo(saldo) {
+        localStorage.setItem("saldo", parseFloat(saldo))
+    }
+    function loadSaldo() {
+        var savedSaldo = parseFloat(localStorage.getItem("saldo"))
+        if(savedSaldo !== null && !isNaN(savedSaldo)) {
+            document.getElementById("saldo").textContent = savedSaldo
+        }
+    }
+
+    function saveRecords() {
+        localStorage.setItem("records", document.getElementById("recordfield").innerHTML)
+    }
+    function loadRecords() {
+        document.getElementById("recordfield").innerHTML = localStorage.getItem("records")
+    }
+
+    window.onload = function() {
+        loadSaldo()
+        loadRecords()
+    }
+ 
+    function masuk() {
+        if(document.getElementById("jumlah").value >= 1 && document.getElementById("catatan").value !== "") {
+            console.log("pemasukkan")
+            document.getElementById("recordfield").innerHTML += "<br>[" + currentDate.getDate() + " - " + currentDate.getMonth() + " - " + currentDate.getFullYear() + " ]: " + currentDate.getHours() + ":" + currentDate.getMinutes() +" (+) " + document.getElementById("jumlah").value + "k - " + document.getElementById("catatan").value 
+            var calcSaldoAdd = parseFloat(document.getElementById("saldo").textContent) + parseFloat(document.getElementById("jumlah").value)
+
+            console.log("saldo : " + parseFloat(document.getElementById("saldo").textContent) + "\nJumlah : " + parseFloat(document.getElementById("jumlah").value) + "\nKalkulasi : " + calcSaldoAdd)
+            
+            document.getElementById("saldo").innerHTML = calcSaldoAdd
+            document.getElementById("jumlah").value = null
+            document.getElementById("catatan").value = null
+            
+            saveSaldo(calcSaldoAdd)
+            saveRecords()
+        }
+        else {
+            alert("INPUT TIDAK BOLEH KOSONG!")
+        }
+    }
+    function keluar() {
+        if(document.getElementById("jumlah").value >= 1 && document.getElementById("catatan").value !== "") {
+            console.log("pengeluaran")
+            document.getElementById("recordfield").innerHTML += "<br>[" + currentDate.getDate() + " - " + currentDate.getMonth() + " - " + currentDate.getFullYear() + " ]: " + currentDate.getHours() + ":" + currentDate.getMinutes() +" (-) " + document.getElementById("jumlah").value + "k - " + document.getElementById("catatan").value 
+            var calcSaldoMin = parseFloat(document.getElementById("saldo").textContent) - parseFloat(document.getElementById("jumlah").value)
+
+            console.log("saldo : " + parseFloat(document.getElementById("saldo").textContent) + "\nJumlah : " + parseFloat(document.getElementById("jumlah").value) + "\nKalkulasi : " + calcSaldoMin)
+            
+            document.getElementById("saldo").innerHTML = calcSaldoMin
+            document.getElementById("jumlah").value = null
+            document.getElementById("catatan").value = null
+
+            saveSaldo(calcSaldoMin)
+            saveRecords()
+        }
+        else {
+            alert("INPUT TIDAK BOLEH KOSONG!")
+        }
+    }
+</script>
