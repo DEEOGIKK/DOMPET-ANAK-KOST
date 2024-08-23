@@ -6,8 +6,8 @@
     <title>DOMPET ANAK KOST</title>
 </head>
 <body>
-    <h1>Rp <span id="saldo">0</span>k</h1>
-    <input id="jumlah" type="number" placeholder="Masukkan Jumlah (>1k)"><br>
+    <h1>Rp <span id="saldo">0</span></h1>
+    <input id="jumlah" type="number" placeholder="Masukkan Jumlah (> 1)"><br>
     <input id="catatan" type="text" placeholder="Masukkan Catatan"><br>
     <Button onclick="masuk()">Masukkan</Button>
     <Button onclick="keluar()">Keluarkan</Button>
@@ -15,7 +15,7 @@
     <br>
     <br>
     <br>
-    <p>app by anak kost for anak kost <br> - deeogikk 2024 - </p>
+    <p onclick="alert('ketik reset di catatan maka aplikasi akan sepenuhnya di reset hehe')">app by anak kost for anak kost <br> - deeogikk 2024 - </p>
 </body>
 </html>
 
@@ -59,6 +59,13 @@
 
 <script>
     var currentDate = new Date
+    var inputJumlah = document.getElementById("jumlah")
+    var jumlahSaldo = 0
+
+    inputJumlah.onkeyup = function() {
+        this.value = this.value.replace(/\./g, "")
+        this.value = this.value.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+    }
 
     function saveSaldo(saldo) {
         localStorage.setItem("saldo", parseFloat(saldo))
@@ -66,7 +73,7 @@
     function loadSaldo() {
         var savedSaldo = parseFloat(localStorage.getItem("saldo"))
         if(savedSaldo !== null && !isNaN(savedSaldo)) {
-            document.getElementById("saldo").textContent = savedSaldo
+            jumlahSaldo = savedSaldo
         }
     }
 
@@ -77,44 +84,57 @@
         document.getElementById("recordfield").innerHTML = localStorage.getItem("records")
     }
 
+    function formatSaldo() {
+        document.getElementById("saldo").innerHTML = jumlahSaldo.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
     window.onload = function() {
         loadSaldo()
         loadRecords()
+        formatSaldo()
+        console.log(jumlahSaldo)
     }
  
     function masuk() {
-        if(document.getElementById("jumlah").value >= 1 && document.getElementById("catatan").value !== "") {
+        if(document.getElementById("jumlah").value.replace(/\./g, "") >= 1 && document.getElementById("catatan").value !== "") {
             console.log("pemasukkan")
-            document.getElementById("recordfield").innerHTML += "<br>[" + currentDate.getDate() + " - " + currentDate.getMonth() + " - " + currentDate.getFullYear() + " ]: " + currentDate.getHours() + ":" + currentDate.getMinutes() +" (+) " + document.getElementById("jumlah").value + "k - " + document.getElementById("catatan").value 
-            var calcSaldoAdd = parseFloat(document.getElementById("saldo").textContent) + parseFloat(document.getElementById("jumlah").value)
-
-            console.log("saldo : " + parseFloat(document.getElementById("saldo").textContent) + "\nJumlah : " + parseFloat(document.getElementById("jumlah").value) + "\nKalkulasi : " + calcSaldoAdd)
+            document.getElementById("recordfield").innerHTML += "<br>[" + currentDate.getDate() + " - " + currentDate.getMonth() + " - " + currentDate.getFullYear() + " ]: " + currentDate.getHours() + ":" + currentDate.getMinutes() +" (+) " + document.getElementById("jumlah").value + " - " + document.getElementById("catatan").value 
             
-            document.getElementById("saldo").innerHTML = calcSaldoAdd
+            var calcSaldoAdd = jumlahSaldo + parseFloat(document.getElementById("jumlah").value.replace(/\./g, "").replace(/\./g, ""))
+
+            console.log("saldo : " + jumlahSaldo + "\nJumlah : " + parseFloat(document.getElementById("jumlah").value.replace(/\./g, "")) + "\nKalkulasi : " + calcSaldoAdd)
+            
+            jumlahSaldo = calcSaldoAdd
             document.getElementById("jumlah").value = null
             document.getElementById("catatan").value = null
             
-            saveSaldo(calcSaldoAdd)
+            saveSaldo(jumlahSaldo)
             saveRecords()
+            formatSaldo()
         }
         else {
             alert("INPUT TIDAK BOLEH KOSONG!")
         }
     }
     function keluar() {
-        if(document.getElementById("jumlah").value >= 1 && document.getElementById("catatan").value !== "") {
+        if(document.getElementById("catatan").value == "reset") {
+            localStorage.clear()
+        }
+        
+        if(document.getElementById("jumlah").value.replace(/\./g, "") >= 1 && document.getElementById("catatan").value !== "") {
             console.log("pengeluaran")
-            document.getElementById("recordfield").innerHTML += "<br>[" + currentDate.getDate() + " - " + currentDate.getMonth() + " - " + currentDate.getFullYear() + " ]: " + currentDate.getHours() + ":" + currentDate.getMinutes() +" (-) " + document.getElementById("jumlah").value + "k - " + document.getElementById("catatan").value 
-            var calcSaldoMin = parseFloat(document.getElementById("saldo").textContent) - parseFloat(document.getElementById("jumlah").value)
+            document.getElementById("recordfield").innerHTML += "<br>[" + currentDate.getDate() + " - " + currentDate.getMonth() + " - " + currentDate.getFullYear() + " ]: " + currentDate.getHours() + ":" + currentDate.getMinutes() +" (-) " + document.getElementById("jumlah").value + " - " + document.getElementById("catatan").value 
+            var calcSaldoMin = jumlahSaldo - parseFloat(document.getElementById("jumlah").value.replace(/\./g, "").replace(/\./g, ""))
 
-            console.log("saldo : " + parseFloat(document.getElementById("saldo").textContent) + "\nJumlah : " + parseFloat(document.getElementById("jumlah").value) + "\nKalkulasi : " + calcSaldoMin)
+            console.log("saldo : " + jumlahSaldo + "\nJumlah : " + parseFloat(document.getElementById("jumlah").value.replace(/\./g, "").replace(/\./g, "")) + "\nKalkulasi : " + calcSaldoMin)
             
-            document.getElementById("saldo").innerHTML = calcSaldoMin
+            jumlahSaldo = calcSaldoMin
             document.getElementById("jumlah").value = null
             document.getElementById("catatan").value = null
 
-            saveSaldo(calcSaldoMin)
+            saveSaldo(jumlahSaldo)
             saveRecords()
+            formatSaldo()
         }
         else {
             alert("INPUT TIDAK BOLEH KOSONG!")
